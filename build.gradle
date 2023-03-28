@@ -30,6 +30,12 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 }
 
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.defaultComponentModel=spring'
+    ]
+}
+
 test {
     useJUnitPlatform()
 }

@@ -20,12 +20,12 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<List<TagDto>> findAll() {
-        return ResponseEntity.ok().body(tagMapper.toDtoList(tagService.findAll()));
+        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(tagService.findAll()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TagDto> findById(@PathVariable long id) {
-        return ResponseEntity.ok().body(tagMapper.toDto(tagService.findById(id)));
+        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDto(tagService.findById(id)));
     }
 
     @PostMapping
@@ -35,14 +35,14 @@ public class TagController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody TagDto tagDto) {
-        tagService.update(id, tagMapper.toEntity(tagDto));
-        return ResponseEntity.ok().body(HttpStatus.OK);
+    public ResponseEntity<TagDto> update(@PathVariable long id, @RequestBody TagDto updatedTagDto) {
+        tagService.update(id, tagMapper.toEntity(updatedTagDto));
+        return ResponseEntity.status(HttpStatus.OK).body(updatedTagDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable long id) {
         tagService.deleteById(id);
-        return ResponseEntity.ok().body(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -31,10 +31,7 @@ public class CertificateService {
 
     public void add(Certificate certificate) {
         certificateDao.add(certificate);
-        tagService.findAll()
-                .stream()
-                .filter(t -> certificate.getDescription().contains(t.toString()))
-                .forEach(tagService::add);
+        certificate.getTags().stream().filter(t->!tagService.findAll().contains(t)).forEach(tagService::add);
     }
 
     public void update(long id, Certificate certificate) {

@@ -9,21 +9,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class AppExceptionHandler {
 
     @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<?> handleNotCorrectedId(TagNotFoundException e) {
+    public ResponseEntity<ExceptionResponse> handleNotCorrectedId(TagNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(e.getMessage(), getErrorCode(e)));
     }
 
     @ExceptionHandler(TagAlreadyExist.class)
-    public ResponseEntity<?> handleNotCorrectedId(TagAlreadyExist e) {
+    public ResponseEntity<ExceptionResponse> handleNotCorrectedId(TagAlreadyExist e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse(e.getMessage(), e.getMessage().toCharArray().length));
     }
 
     @ExceptionHandler(CertificateNotFoundException.class)
-    public ResponseEntity<?> handleNotCorrectedId(CertificateNotFoundException e) {
+    public ResponseEntity<ExceptionResponse> handleNotCorrectedId(CertificateNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(e.getMessage(), getErrorCode(e)));
