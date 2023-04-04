@@ -27,7 +27,7 @@ public interface CertificateDao {
     void add(Certificate certificate);
 
     /**
-     * @param id - unique param of entity. Throw exception if certificate not found
+     * @param id          - unique param of entity. Throw exception if certificate not found
      * @param certificate - request body of new certificate
      * @see ClassNotFoundException
      */
@@ -37,4 +37,9 @@ public interface CertificateDao {
      * @param id - unique param of entity. Throw exception if certificate not found
      */
     void deleteById(long id);
+
+    /**
+     * @return find certificate list with parameters
+     */
+    List<Certificate> findByFilter(String name, String description, double minPrice, double maxPrice);
 }

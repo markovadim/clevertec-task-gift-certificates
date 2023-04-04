@@ -1,8 +1,8 @@
 package ru.clevertec.ecl.dao;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.clevertec.ecl.entities.Tag;
@@ -14,37 +14,66 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TagDaoImpl implements TagDao {
 
-    private static final String GET_ALL = "select * from tags";
-    private static final String FIND_BY_ID = "select * from tags where id = ?";
-    private static final String INSERT_INTO = "insert into tags (name) values (?)";
-    private static final String UPDATE = "update tags set name = ? where id = ?";
-    private static final String DELETE = "delete from tags where id = ?";
-
-    private final JdbcTemplate jdbcTemplate;
+    private final SessionFactory sessionFactory;
 
     @Override
     public List<Tag> findAll() {
-        return jdbcTemplate.query(GET_ALL, new BeanPropertyRowMapper<>(Tag.class));
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            List<Tag> list = session.createQuery("FROM Tag").getResultList();
+            session.getTransaction().commit();
+            return list;
+        }
     }
 
     @Override
     public Optional<Tag> findById(long id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID, new BeanPropertyRowMapper<>(Tag.class), id));
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Optional<Tag> tag = session.byId(Tag.class).loadOptional(id);
+            session.getTransaction().commit();
+            return tag;
+        }
     }
 
     @Override
     public void add(Tag tag) {
-        jdbcTemplate.update(INSERT_INTO, tag.getName());
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.save(tag);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
     }
 
     @Transactional
     @Override
-    public void update(long id, Tag tag) {
-        jdbcTemplate.update(UPDATE, tag.getName(), id);
+    public void update(long id, Tag updatedTag) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Tag tag = session.get(Tag.class, id);
+            tag.setName(updatedTag.getName());
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
     }
 
     @Override
     public void deleteById(long id) {
-        jdbcTemplate.update(DELETE, id);
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.remove(session.get(Tag.class, id));
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
     }
 }

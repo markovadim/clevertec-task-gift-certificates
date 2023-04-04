@@ -55,8 +55,8 @@ class CertificateServiceTest {
 
     @Test
     void checkFindByFilter() {
-        doReturn(MockUtil.certificateList()).when(certificateDao).findAll();
+        doReturn(MockUtil.certificateList()).when(certificateDao).findByFilter("demo", "description", 1.0, 40.0);
 
-        assertEquals(1, certificateService.findByFilter("demo", "description", 1.0, 40.0, "tag_1").size());
+        assertEquals(1, certificateService.findByFilter("demo", "description", 1.0, 40.0).size());
     }
 }

@@ -10,7 +10,7 @@ create table if not exists certificates
     name           varchar(50)      not null unique,
     description    varchar(255),
     price          double precision not null,
-    duration       timestamp,
+    duration       int8,
     createDate     timestamp        not null,
     lastUpdateDate timestamp
 );

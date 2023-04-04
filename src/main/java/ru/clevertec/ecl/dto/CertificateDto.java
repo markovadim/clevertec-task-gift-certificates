@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.clevertec.ecl.entities.Tag;
 
 import java.util.List;
 
@@ -21,5 +20,5 @@ public class CertificateDto {
     private long duration;
     private String createDate;
     private String lastUpdateDate;
-    private List<Tag>tags;
+    private List<TagDto>tags;
 }

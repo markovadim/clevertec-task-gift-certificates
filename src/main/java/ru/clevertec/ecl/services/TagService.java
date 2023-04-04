@@ -1,8 +1,7 @@
 package ru.clevertec.ecl.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import ru.clevertec.ecl.dao.TagDao;
 import ru.clevertec.ecl.entities.Tag;
@@ -22,17 +21,13 @@ public class TagService {
     }
 
     public Tag findById(long id) {
-        try {
-            return tagDao.findById(id).get();
-        } catch (EmptyResultDataAccessException e) {
-            throw new TagNotFoundException(id);
-        }
+        return tagDao.findById(id).orElseThrow(() -> new TagNotFoundException(id));
     }
 
     public void add(Tag tag) {
         try {
             tagDao.add(tag);
-        } catch (DuplicateKeyException e) {
+        } catch (ConstraintViolationException e) {
             throw new TagAlreadyExist(tag.getName());
         }
     }

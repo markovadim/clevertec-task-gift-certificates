@@ -42,7 +42,7 @@ class TagServiceTest {
 
     @Test
     void checkAddShouldThrowException() {
-        Tag tag = new Tag(111, "tag_1");
+        Tag tag = new Tag("tag_1");
 
         doThrow(TagAlreadyExist.class).when(tagDao).add(tag);
 
@@ -51,7 +51,7 @@ class TagServiceTest {
 
     @Test
     void checkUpdateShouldThrowException() {
-        Tag tag = new Tag(32, "tag_tag");
+        Tag tag = new Tag("tag_tag");
         doThrow(TagNotFoundException.class).when(tagDao).findById(11);
 
         assertThrows(TagNotFoundException.class, () -> tagService.update(11, tag));

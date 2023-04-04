@@ -1,12 +1,14 @@
 package ru.clevertec.ecl.dao;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.clevertec.ecl.entities.Certificate;
-import ru.clevertec.ecl.mapping.CertificateRowMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,49 +16,85 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CertificateDaoImpl implements CertificateDao {
 
-    private static final String FIND_ALL = "SELECT * FROM certificates";
-    private static final String FIND_BY_ID = "select * from certificates where id = ?";
-    private static final String INSERT_INTO = "INSERT INTO certificates (name, description, price,duration, createdate, lastupdatedate) VALUES (?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)";
-    private static final String UPDATE = "UPDATE certificates SET name = ?, description = ?, price = ?, duration = ?,  lastupdatedate = now() WHERE id = ?";
-    private static final String DELETE = "DELETE FROM certificates WHERE id = ?";
-
-    private final JdbcTemplate jdbcTemplate;
+    private final SessionFactory sessionFactory;
 
     @Override
     public List<Certificate> findAll() {
-        return jdbcTemplate.query(FIND_ALL, new CertificateRowMapper());
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            List<Certificate> list = session.createQuery("FROM Certificate").getResultList();
+            list.forEach(c -> Hibernate.initialize(c.getTags()));
+            session.getTransaction().commit();
+            return list;
+        }
     }
 
     @Override
     public Optional<Certificate> findById(long id) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID, new CertificateRowMapper(), id));
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Optional<Certificate> certificate = session.byId(Certificate.class).loadOptional(id);
+            Hibernate.initialize(certificate.get().getTags());
+            session.getTransaction().commit();
+            return certificate;
+        }
     }
 
     @Override
-    public void add(Certificate giftCertificate) {
-        jdbcTemplate.update(INSERT_INTO,
-                giftCertificate.getName(),
-                giftCertificate.getDescription(),
-                giftCertificate.getPrice(),
-                giftCertificate.getDuration().toDays()
-        );
+    public void add(Certificate certificate) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.save(certificate);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
     }
 
-    @Transactional
     @Override
-    public void update(long id, Certificate giftCertificate) {
-        jdbcTemplate.update(UPDATE,
-                giftCertificate.getName(),
-                giftCertificate.getDescription(),
-                giftCertificate.getPrice(),
-                giftCertificate.getDuration().toDays(),
-                id
-        );
+    public void update(long id, Certificate updatedCertificate) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Certificate certificate = session.get(Certificate.class, id);
+            certificate.setName(updatedCertificate.getName());
+            certificate.setDescription(updatedCertificate.getDescription());
+            certificate.setPrice(updatedCertificate.getPrice());
+            certificate.setDuration(updatedCertificate.getDuration());
+            certificate.setCreateDate(updatedCertificate.getCreateDate());
+            certificate.setLastUpdateDate(LocalDateTime.now());
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
     }
 
-    @Transactional
     @Override
     public void deleteById(long id) {
-        jdbcTemplate.update(DELETE, id);
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.remove(session.get(Certificate.class, id));
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (sessionFactory.getCurrentSession().getTransaction() != null) {
+                sessionFactory.getCurrentSession().getTransaction().rollback();
+            }
+        }
+    }
+
+    public List<Certificate> findByFilter(String name, String description, double minPrice, double maxPrice) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Query<Certificate> query = session.createQuery("FROM Certificate WHERE name = :name or description like :description or (price>=:minPrice and price<=:maxPrice)");
+            query.setParameter("name", name);
+            query.setParameter("description", "%" + description + "%");
+            query.setParameter("minPrice", minPrice);
+            query.setParameter("maxPrice", maxPrice);
+            session.getTransaction().commit();
+            return query.getResultList();
+        }
     }
 }

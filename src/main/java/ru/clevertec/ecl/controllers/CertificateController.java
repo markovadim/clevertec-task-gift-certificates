@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.clevertec.ecl.dto.CertificateDto;
+import ru.clevertec.ecl.dto.TagDto;
 import ru.clevertec.ecl.mapping.CertificateMapper;
+import ru.clevertec.ecl.mapping.TagMapper;
 import ru.clevertec.ecl.services.CertificateService;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class CertificateController {
 
     private final CertificateService certificateService;
     private final CertificateMapper certificateMapper;
+    private final TagMapper tagMapper;
 
     @GetMapping
     public ResponseEntity<List<CertificateDto>> findAll() {
@@ -51,8 +54,12 @@ public class CertificateController {
     public ResponseEntity<List<CertificateDto>> findByFilter(@RequestParam(required = false) String name,
                                                              @RequestParam(required = false) String description,
                                                              @RequestParam(required = false) double minPrice,
-                                                             @RequestParam(required = false) double maxPrice,
-                                                             @RequestParam(required = false) String tag) {
-        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findByFilter(name, description, minPrice, maxPrice, tag)));
+                                                             @RequestParam(required = false) double maxPrice) {
+        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findByFilter(name, description, minPrice, maxPrice)));
+    }
+
+    @GetMapping("/{id}/tags")
+    public ResponseEntity<List<TagDto>> findTags(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(certificateService.findTags(id)));
     }
 }
