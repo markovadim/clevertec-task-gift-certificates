@@ -7,9 +7,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.clevertec.ecl.entities.Certificate;
+import ru.clevertec.ecl.exceptions.CertificateNotFoundException;
+import ru.clevertec.ecl.services.TagService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -37,13 +40,17 @@ public class CertificateDaoImpl implements CertificateDao {
             Hibernate.initialize(certificate.get().getTags());
             session.getTransaction().commit();
             return certificate;
+        } catch (NoSuchElementException e) {
+            throw new CertificateNotFoundException(id);
         }
     }
 
     @Override
     public void add(Certificate certificate) {
+        certificate.setCreateDate(LocalDateTime.now());
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
+            certificate.getTags().forEach(session::save);
             session.save(certificate);
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -62,8 +69,9 @@ public class CertificateDaoImpl implements CertificateDao {
             certificate.setDescription(updatedCertificate.getDescription());
             certificate.setPrice(updatedCertificate.getPrice());
             certificate.setDuration(updatedCertificate.getDuration());
-            certificate.setCreateDate(updatedCertificate.getCreateDate());
             certificate.setLastUpdateDate(LocalDateTime.now());
+            updatedCertificate.getTags().forEach(session::saveOrUpdate);
+            certificate.setTags(updatedCertificate.getTags());
             session.getTransaction().commit();
         } catch (Exception e) {
             if (sessionFactory.getCurrentSession().getTransaction() != null) {

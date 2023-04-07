@@ -14,7 +14,6 @@ import java.util.List;
 public class CertificateService {
 
     private final CertificateDao certificateDao;
-    private final TagService tagService;
 
     public List<Certificate> findAll() {
         return certificateDao.findAll();
@@ -26,7 +25,6 @@ public class CertificateService {
 
     public void add(Certificate certificate) {
         certificateDao.add(certificate);
-        certificate.getTags().stream().filter(t -> !tagService.findAll().contains(t)).forEach(tagService::add);
     }
 
     public void update(long id, Certificate certificate) {

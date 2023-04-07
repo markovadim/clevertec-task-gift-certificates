@@ -30,7 +30,7 @@ public class Certificate {
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "tag_certificate",
             joinColumns = {@JoinColumn(name = "certificateid")},
