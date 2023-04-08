@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.clevertec.ecl.dto.TagDto;
+import ru.clevertec.ecl.entities.Tag;
 import ru.clevertec.ecl.mapping.TagMapper;
 import ru.clevertec.ecl.services.TagService;
 
@@ -44,5 +45,10 @@ public class TagController {
     public ResponseEntity<?> deleteById(@PathVariable long id) {
         tagService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Tag>> findByName(@RequestParam String name) {
+        return ResponseEntity.status(HttpStatus.OK).body(tagService.findAllByName(name));
     }
 }

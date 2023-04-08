@@ -7,6 +7,7 @@ import ru.clevertec.ecl.entities.Certificate;
 import ru.clevertec.ecl.entities.Tag;
 import ru.clevertec.ecl.exceptions.CertificateNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,12 +25,17 @@ public class CertificateService {
     }
 
     public void add(Certificate certificate) {
-        certificateDao.add(certificate);
+        certificateDao.save(certificate);
     }
 
-    public void update(long id, Certificate certificate) {
-        findById(id);
-        certificateDao.update(id, certificate);
+    public void update(long id, Certificate updatedCertificate) {
+        Certificate certificate = findById(id);
+        certificate.setName(updatedCertificate.getName());
+        certificate.setDescription(updatedCertificate.getDescription());
+        certificate.setPrice(updatedCertificate.getPrice());
+        certificate.setDuration(updatedCertificate.getDuration());
+        certificate.setLastUpdateDate(LocalDateTime.now());
+        certificateDao.save(certificate);
     }
 
     public void deleteById(long id) {
@@ -38,7 +44,7 @@ public class CertificateService {
     }
 
     public List<Certificate> findByFilter(String name, String description, double minPrice, double maxPrice) {
-        return certificateDao.findByFilter(name, description, minPrice, maxPrice);
+        return certificateDao.findAllByNameContainsOrDescriptionContainsOrPriceIsGreaterThanAndPriceIsLessThan(name, description, minPrice, maxPrice);
     }
 
     public List<Tag> findTags(long id) {

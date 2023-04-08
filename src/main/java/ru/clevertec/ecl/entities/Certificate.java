@@ -1,10 +1,10 @@
 package ru.clevertec.ecl.entities;
 
 
+import jakarta.persistence.*;
 import lombok.*;
 import ru.clevertec.ecl.mapping.DurationConverter;
 
-import javax.persistence.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +27,9 @@ public class Certificate {
 
     @Convert(converter = DurationConverter.class)
     private Duration duration;
+    @Column(name = "createdate")
     private LocalDateTime createDate;
+    @Column(name = "lastupdatedate")
     private LocalDateTime lastUpdateDate;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

@@ -1,7 +1,8 @@
 package ru.clevertec.ecl.mapping;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+
 import java.time.Duration;
 
 @Converter
@@ -9,7 +10,7 @@ public class DurationConverter implements AttributeConverter<Duration, Long> {
 
     @Override
     public Long convertToDatabaseColumn(Duration attribute) {
-        Long longValue =attribute.toDays();
+        Long longValue = attribute.toDays();
         return longValue;
     }
 

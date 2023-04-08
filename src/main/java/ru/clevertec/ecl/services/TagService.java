@@ -26,19 +26,25 @@ public class TagService {
 
     public void add(Tag tag) {
         try {
-            tagDao.add(tag);
+            tagDao.save(tag);
         } catch (ConstraintViolationException e) {
             throw new TagAlreadyExist(tag.getName());
         }
     }
 
-    public void update(long id, Tag tag) {
-        findById(id);
-        tagDao.update(id, tag);
+    public void update(long id, Tag updatedTag) {
+        Tag tag = findById(id);
+        tag.setName(updatedTag.getName());
+        updatedTag.getCertificateList().forEach(tag.getCertificateList()::add);
+        tagDao.save(tag);
     }
 
     public void deleteById(long id) {
         findById(id);
         tagDao.deleteById(id);
+    }
+
+    public List<Tag> findAllByName(String name) {
+        return tagDao.findAllByNameContains(name);
     }
 }
