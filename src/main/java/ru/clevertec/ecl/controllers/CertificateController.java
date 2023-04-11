@@ -2,6 +2,8 @@ package ru.clevertec.ecl.controllers;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,8 @@ public class CertificateController {
     private final TagMapper tagMapper;
 
     @GetMapping
-    public ResponseEntity<List<CertificateDto>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findAll()));
+    public ResponseEntity<List<CertificateDto>> findAll(@PageableDefault(sort = "name") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findAll(pageable)));
     }
 
     @GetMapping("/{id}")
@@ -40,7 +42,7 @@ public class CertificateController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<CertificateDto> update(@PathVariable long id, @RequestBody CertificateDto updatedCertificateDto) {
-        certificateService.update(id, certificateMapper.toEntity(updatedCertificateDto));
+        certificateService.update(id, updatedCertificateDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedCertificateDto);
     }
 
@@ -54,12 +56,18 @@ public class CertificateController {
     public ResponseEntity<List<CertificateDto>> findByFilter(@RequestParam(required = false) String name,
                                                              @RequestParam(required = false) String description,
                                                              @RequestParam(required = false) double minPrice,
-                                                             @RequestParam(required = false) double maxPrice) {
-        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findByFilter(name, description, minPrice, maxPrice)));
+                                                             @RequestParam(required = false) double maxPrice,
+                                                             @PageableDefault(sort = "name") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findByFilter(name, description, minPrice, maxPrice, pageable)));
     }
 
     @GetMapping("/{id}/tags")
-    public ResponseEntity<List<TagDto>> findTags(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(certificateService.findTags(id)));
+    public ResponseEntity<List<TagDto>> findTags(@PathVariable long id, @PageableDefault(sort = "name") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(certificateService.findTags(id, pageable)));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CertificateDto>> findByTags(Pageable pageable, @RequestParam String... tag) {
+        return ResponseEntity.status(HttpStatus.OK).body(certificateMapper.toDtoList(certificateService.findByTags(pageable, tag)));
     }
 }

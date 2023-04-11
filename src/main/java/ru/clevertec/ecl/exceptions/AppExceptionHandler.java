@@ -29,6 +29,20 @@ public class AppExceptionHandler {
                 .body(new ExceptionResponse(e.getMessage(), getErrorCode(e)));
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNotCorrectedUserId(UserNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ExceptionResponse(e.getMessage(), getErrorCode(e)));
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNotCorrectOrderId(OrderNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ExceptionResponse(e.getMessage(), getErrorCode(e)));
+    }
+
     private int getErrorCode(Exception e) {
         String errorId = e.getMessage().replaceAll("\\D", "");
         return Integer.parseInt(HttpStatus.NOT_FOUND.value() + errorId);

@@ -1,6 +1,8 @@
 package ru.clevertec.ecl.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +22,8 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @GetMapping
-    public ResponseEntity<List<TagDto>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(tagService.findAll()));
+    public ResponseEntity<List<TagDto>> findAll(@PageableDefault(sort = "name") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(tagService.findAll(pageable)));
     }
 
     @GetMapping("/{id}")
@@ -48,7 +50,7 @@ public class TagController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<Tag>> findByName(@RequestParam String name) {
-        return ResponseEntity.status(HttpStatus.OK).body(tagService.findAllByName(name));
+    public ResponseEntity<List<Tag>> findByName(@RequestParam String name, @PageableDefault(sort = "name") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(tagService.findAllByName(name, pageable));
     }
 }

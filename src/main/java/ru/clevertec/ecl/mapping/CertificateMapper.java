@@ -1,7 +1,6 @@
 package ru.clevertec.ecl.mapping;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import ru.clevertec.ecl.dto.CertificateDto;
 import ru.clevertec.ecl.entities.Certificate;
 
@@ -18,6 +17,9 @@ public interface CertificateMapper {
     Certificate toEntity(CertificateDto certificateDto);
 
     List<CertificateDto> toDtoList(List<Certificate> entityList);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateCertificateByDto(CertificateDto dto, @MappingTarget Certificate entity);
 
     default Duration toDuration(long days) {
         return Duration.ofDays(days);

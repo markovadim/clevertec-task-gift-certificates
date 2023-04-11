@@ -8,6 +8,7 @@ import ru.clevertec.ecl.mapping.DurationConverter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "certificates")
 @Entity
@@ -27,19 +28,23 @@ public class Certificate {
 
     @Convert(converter = DurationConverter.class)
     private Duration duration;
-    @Column(name = "createdate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
-    @Column(name = "lastupdatedate")
+    @Column(name = "last_update_date")
     private LocalDateTime lastUpdateDate;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "tag_certificate",
-            joinColumns = {@JoinColumn(name = "certificateid")},
-            inverseJoinColumns = {@JoinColumn(name = "tagid")}
+            joinColumns = {@JoinColumn(name = "certificate_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
     @ToString.Exclude
     private List<Tag> tags;
+
+    @ManyToMany(mappedBy = "certificates")
+    @ToString.Exclude
+    private Set<Order> orders;
 
     public Certificate(String name, String description, double price, Duration duration, LocalDateTime createDate, LocalDateTime lastUpdateDate) {
         this.name = name;

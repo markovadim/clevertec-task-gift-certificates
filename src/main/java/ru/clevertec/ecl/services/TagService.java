@@ -2,6 +2,7 @@ package ru.clevertec.ecl.services;
 
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.clevertec.ecl.dao.TagDao;
 import ru.clevertec.ecl.entities.Tag;
@@ -16,8 +17,8 @@ public class TagService {
 
     private final TagDao tagDao;
 
-    public List<Tag> findAll() {
-        return tagDao.findAll();
+    public List<Tag> findAll(Pageable pageable) {
+        return tagDao.findAll(pageable).getContent();
     }
 
     public Tag findById(long id) {
@@ -44,7 +45,7 @@ public class TagService {
         tagDao.deleteById(id);
     }
 
-    public List<Tag> findAllByName(String name) {
-        return tagDao.findAllByNameContains(name);
+    public List<Tag> findAllByName(String name, Pageable pageable) {
+        return tagDao.findAllByNameContains(name, pageable).getContent();
     }
 }

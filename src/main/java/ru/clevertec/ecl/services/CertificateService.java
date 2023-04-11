@@ -1,11 +1,15 @@
 package ru.clevertec.ecl.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.clevertec.ecl.dao.CertificateDao;
+import ru.clevertec.ecl.dto.CertificateDto;
 import ru.clevertec.ecl.entities.Certificate;
 import ru.clevertec.ecl.entities.Tag;
 import ru.clevertec.ecl.exceptions.CertificateNotFoundException;
+import ru.clevertec.ecl.mapping.CertificateMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,9 +19,10 @@ import java.util.List;
 public class CertificateService {
 
     private final CertificateDao certificateDao;
+    private final CertificateMapper certificateMapper;
 
-    public List<Certificate> findAll() {
-        return certificateDao.findAll();
+    public List<Certificate> findAll(Pageable pageable) {
+        return certificateDao.findAll(pageable).getContent();
     }
 
     public Certificate findById(long id) {
@@ -28,13 +33,10 @@ public class CertificateService {
         certificateDao.save(certificate);
     }
 
-    public void update(long id, Certificate updatedCertificate) {
+    public void update(long id, CertificateDto certificateDto) {
         Certificate certificate = findById(id);
-        certificate.setName(updatedCertificate.getName());
-        certificate.setDescription(updatedCertificate.getDescription());
-        certificate.setPrice(updatedCertificate.getPrice());
-        certificate.setDuration(updatedCertificate.getDuration());
-        certificate.setLastUpdateDate(LocalDateTime.now());
+        certificateDto.setLastUpdateDate(LocalDateTime.now().toString());
+        certificateMapper.updateCertificateByDto(certificateDto, certificate);
         certificateDao.save(certificate);
     }
 
@@ -43,11 +45,16 @@ public class CertificateService {
         certificateDao.deleteById(id);
     }
 
-    public List<Certificate> findByFilter(String name, String description, double minPrice, double maxPrice) {
-        return certificateDao.findAllByNameContainsOrDescriptionContainsOrPriceIsGreaterThanAndPriceIsLessThan(name, description, minPrice, maxPrice);
+    public List<Certificate> findByFilter(String name, String description, double minPrice, double maxPrice, Pageable pageable) {
+        return certificateDao.findAllByNameContainsOrDescriptionContainsOrPriceIsGreaterThanAndPriceIsLessThan(name, description, minPrice, maxPrice, pageable).getContent();
     }
 
-    public List<Tag> findTags(long id) {
-        return findById(id).getTags();
+    public List<Tag> findTags(long id, Pageable pageable) {
+        List<Tag> tags = findById(id).getTags();
+        return new PageImpl<>(tags, pageable, tags.size()).getContent();
+    }
+
+    public List<Certificate> findByTags(Pageable pageable, String[] tag) {
+        return certificateDao.certificatesBySomeTags(tag, pageable).getContent();
     }
 }
