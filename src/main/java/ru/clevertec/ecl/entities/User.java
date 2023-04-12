@@ -24,4 +24,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Order> orders;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

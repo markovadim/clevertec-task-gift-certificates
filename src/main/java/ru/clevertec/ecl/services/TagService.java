@@ -5,6 +5,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.clevertec.ecl.dao.TagDao;
+import ru.clevertec.ecl.dto.TagDto;
 import ru.clevertec.ecl.entities.Tag;
 import ru.clevertec.ecl.exceptions.TagAlreadyExist;
 import ru.clevertec.ecl.exceptions.TagNotFoundException;
@@ -33,10 +34,9 @@ public class TagService {
         }
     }
 
-    public void update(long id, Tag updatedTag) {
+    public void update(long id, TagDto updatedTag) {
         Tag tag = findById(id);
         tag.setName(updatedTag.getName());
-        updatedTag.getCertificateList().forEach(tag.getCertificateList()::add);
         tagDao.save(tag);
     }
 

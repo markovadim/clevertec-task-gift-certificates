@@ -1,18 +1,23 @@
 package ru.clevertec.ecl.services;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.clevertec.ecl.dao.TagDao;
+import ru.clevertec.ecl.dto.TagDto;
 import ru.clevertec.ecl.entities.Tag;
 import ru.clevertec.ecl.exceptions.TagAlreadyExist;
 import ru.clevertec.ecl.exceptions.TagNotFoundException;
 import ru.clevertec.ecl.util.MockUtil;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -25,42 +30,83 @@ class TagServiceTest {
 
     @Test
     void checkFindAllShouldReturnRightListSize() {
-        doReturn(MockUtil.getTags()).when(tagDao).findAll();
+        doReturn(new PageImpl<>(MockUtil.tagList())).when(tagDao).findAll(Pageable.unpaged());
 
         int expectedSize = 2;
-        int actualSize = tagService.findAll().size();
+        int actualSize = tagService.findAll(Pageable.unpaged()).size();
 
         assertEquals(expectedSize, actualSize);
     }
 
     @Test
     void checkFindByIdShouldThrowException() {
-        doThrow(TagNotFoundException.class).when(tagDao).findById(1);
+        doThrow(TagNotFoundException.class).when(tagDao).findById(1L);
 
-        assertThrows(TagNotFoundException.class, () -> tagService.findById(1));
+        assertThrows(TagNotFoundException.class, () -> tagService.findById(1L));
+    }
+
+    @Test
+    void checkFindByIdShouldReturnRightTagName() {
+        doReturn(Optional.of(MockUtil.tagList().get(0))).when(tagDao).findById(1L);
+
+        String expectedName = "tag_1";
+        String actualName = tagService.findById(1L).getName();
+
+        assertEquals(expectedName, actualName);
     }
 
     @Test
     void checkAddShouldThrowException() {
         Tag tag = new Tag("tag_1");
 
-        doThrow(TagAlreadyExist.class).when(tagDao).add(tag);
+        doThrow(TagAlreadyExist.class).when(tagDao).save(tag);
+
+        assertThrows(TagAlreadyExist.class, () -> tagService.add(tag));
+    }
+
+    @Test
+    void checkAddTagShoulThrowConstraintViolationException() {
+        Tag tag = MockUtil.tagList().get(0);
+        doThrow(ConstraintViolationException.class).when(tagDao).save(tag);
 
         assertThrows(TagAlreadyExist.class, () -> tagService.add(tag));
     }
 
     @Test
     void checkUpdateShouldThrowException() {
-        Tag tag = new Tag("tag_tag");
-        doThrow(TagNotFoundException.class).when(tagDao).findById(11);
+        TagDto tag = new TagDto(11L, "tag_tag");
+        doThrow(TagNotFoundException.class).when(tagDao).findById(11L);
 
         assertThrows(TagNotFoundException.class, () -> tagService.update(11, tag));
     }
 
     @Test
+    void checkUpdateShouldChangeTagName() {
+        TagDto updatedTagDto = new TagDto(11L, "tag_tag");
+        Tag tagFromDb = new Tag("tag_1");
+        doReturn(Optional.of(tagFromDb)).when(tagDao).findById(1L);
+        tagService.update(1L, updatedTagDto);
+
+        String expectedName = "tag_tag";
+        String actualName = tagFromDb.getName();
+
+        assertEquals(expectedName, actualName);
+    }
+
+    @Test
     void checkDeleteByIdShouldThrowException() {
-        doThrow(TagNotFoundException.class).when(tagDao).findById(1);
+        doThrow(TagNotFoundException.class).when(tagDao).findById(1L);
 
         assertThrows(TagNotFoundException.class, () -> tagService.deleteById(1));
+    }
+
+    @Test
+    void checkFindAllByNameShouldReturnTagList() {
+        doReturn(new PageImpl<>(MockUtil.tagList())).when(tagDao).findAllByNameContains("tag", Pageable.unpaged());
+
+        int expectedListSize = 2;
+        int actualListSize = tagService.findAllByName("tag", Pageable.unpaged()).size();
+
+        assertEquals(expectedListSize, actualListSize);
     }
 }
