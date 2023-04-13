@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MockUtil {
 
@@ -44,7 +45,9 @@ public class MockUtil {
     }
 
     public static List<Order> orderList() {
-        return List.of(new Order(), new Order());
+        Order order = new Order();
+        order.setCertificates(new HashSet<>(certificateList()));
+        return List.of(order, new Order());
     }
 
     public static List<User> userList() {

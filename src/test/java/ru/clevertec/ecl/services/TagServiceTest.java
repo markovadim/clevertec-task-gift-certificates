@@ -18,8 +18,7 @@ import ru.clevertec.ecl.util.MockUtil;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TagServiceTest {
@@ -65,11 +64,21 @@ class TagServiceTest {
     }
 
     @Test
-    void checkAddTagShoulThrowConstraintViolationException() {
+    void checkAddTagShouldThrowConstraintViolationException() {
         Tag tag = MockUtil.tagList().get(0);
         doThrow(ConstraintViolationException.class).when(tagDao).save(tag);
 
         assertThrows(TagAlreadyExist.class, () -> tagService.add(tag));
+    }
+
+    @Test
+    void checkAddShouldCreateTag() {
+        Tag tag = MockUtil.tagList().get(0);
+        doReturn(tag).when(tagDao).save(tag);
+
+        tagService.add(tag);
+
+        verify(tagDao).save(tag);
     }
 
     @Test
@@ -98,6 +107,16 @@ class TagServiceTest {
         doThrow(TagNotFoundException.class).when(tagDao).findById(1L);
 
         assertThrows(TagNotFoundException.class, () -> tagService.deleteById(1));
+    }
+
+    @Test
+    void checkDeleteByIdShouldCallMethod() {
+        doReturn(Optional.of(MockUtil.tagList().get(0))).when(tagDao).findById(1L);
+        doNothing().when(tagDao).deleteById(1L);
+
+        tagService.deleteById(1L);
+
+        verify(tagDao).deleteById(1L);
     }
 
     @Test

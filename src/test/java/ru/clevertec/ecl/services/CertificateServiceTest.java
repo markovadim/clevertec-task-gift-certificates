@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import ru.clevertec.ecl.dao.CertificateDao;
 import ru.clevertec.ecl.entities.Certificate;
 import ru.clevertec.ecl.exceptions.CertificateNotFoundException;
+import ru.clevertec.ecl.mapping.CertificateMapper;
 import ru.clevertec.ecl.util.MockUtil;
 
 import java.time.Duration;
@@ -18,8 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CertificateServiceTest {
@@ -28,6 +28,8 @@ class CertificateServiceTest {
     private CertificateDao certificateDao;
     @InjectMocks
     private CertificateService certificateService;
+    @Mock
+    private CertificateMapper certificateMapper;
 
     @Test
     void checkFindAllShouldReturnSizeOfThree() {
@@ -70,6 +72,16 @@ class CertificateServiceTest {
         doThrow(CertificateNotFoundException.class).when(certificateDao).findById(1L);
 
         assertThrows(CertificateNotFoundException.class, () -> certificateService.deleteById(1));
+    }
+
+    @Test
+    void checkDeleteByIdShouldCallMethod() {
+        doReturn(Optional.of(MockUtil.certificate())).when(certificateDao).findById(1L);
+        doNothing().when(certificateDao).deleteById(1L);
+
+        certificateService.deleteById(1L);
+
+        verify(certificateDao).deleteById(1L);
     }
 
     @Test

@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -24,6 +24,8 @@ class OrderServiceTest {
     private OrderDao orderDao;
     @InjectMocks
     private OrderService orderService;
+    @Mock
+    private CertificateService certificateService;
 
     @Test
     void checkFindAllShouldReturnNotEmptyList() {
@@ -47,5 +49,16 @@ class OrderServiceTest {
         orderService.deleteById(1L);
 
         assertDoesNotThrow(() -> orderService.deleteById(1L));
+    }
+
+    @Test
+    void checkAddShouldCreateOrder() {
+        doReturn(MockUtil.certificate()).when(certificateService).findById(1L);
+        doReturn(Optional.of(MockUtil.orderList().get(0))).when(orderDao).addOrderToUser(1L, 12.23);
+        doNothing().when(orderDao).addCertificateToOrder(0L, 1L);
+
+        orderService.add(1L, 1L);
+
+        verify(orderDao).addCertificateToOrder(0L, 1L);
     }
 }
