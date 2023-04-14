@@ -1,6 +1,8 @@
 package ru.clevertec.ecl.util;
 
 import ru.clevertec.ecl.dto.CertificateDto;
+import ru.clevertec.ecl.dto.TagDto;
+import ru.clevertec.ecl.dto.UserDto;
 import ru.clevertec.ecl.entities.Certificate;
 import ru.clevertec.ecl.entities.Order;
 import ru.clevertec.ecl.entities.Tag;
@@ -10,7 +12,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MockUtil {
 
@@ -18,6 +19,13 @@ public class MockUtil {
         Tag tag1 = new Tag("tag_1");
         Tag tag2 = new Tag("tag_2");
         return List.of(tag1, tag2);
+    }
+
+    public static List<TagDto> tagDtoList() {
+        return List.of(
+                new TagDto(1L, "tag_dto_1"),
+                new TagDto(2L, "tag_dto_2")
+        );
     }
 
     public static List<Certificate> certificateList() {
@@ -56,6 +64,19 @@ public class MockUtil {
         return List.of(
                 user,
                 new User("user_2", "emailaddress@mail.ru")
+        );
+    }
+
+    public static List<UserDto> userDtoList() {
+        return List.of(
+                UserDto.builder()
+                        .name("User_1")
+                        .email("user1mail.ru")
+                        .build(),
+                UserDto.builder()
+                        .name("User_2")
+                        .email("user2mail.ru")
+                        .build()
         );
     }
 }
