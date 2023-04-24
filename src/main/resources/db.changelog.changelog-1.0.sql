@@ -1,9 +1,11 @@
-create table if not exists tags
+--liquibase formatted sql
+
+--changeset liquibase-demo-service:create tables tags, certificates, tag_certificate, users, orders, order_certificate
+create table tags
 (
     id   bigserial primary key,
     name varchar(50) not null unique
 );
-
 create table if not exists certificates
 (
     id             bigserial primary key,

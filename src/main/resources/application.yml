@@ -4,6 +4,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/clevertec
     username: postgres
     password: postgres
-  jpa:
-    hibernate:
-      ddl-auto: validate
+  liquibase:
+    change-log: db.changelog-master.yml
+    enabled: false

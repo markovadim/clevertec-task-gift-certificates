@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset liquibase-demo-service:insert_2 values in tables
+
 insert into tags (name)
 values ('tag_1'),
        ('tag_2'),

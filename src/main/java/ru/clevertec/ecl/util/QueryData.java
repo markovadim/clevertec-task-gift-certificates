@@ -7,9 +7,9 @@ public class QueryData {
     public static final String CREATE_ORDER = "INSERT INTO orders (number, user_id, order_price, buy_date) VALUES (random()*1000, :userId, :orderPrice, now()) RETURNING *";
 
     public static final String FIND_POPULAR_TAG_FROM_ORDER = "SELECT name FROM tags WHERE id =( " +
-            "SELECT tagid FROM tag_certificate tc WHERE tc.certificate_id = (" +
+            "SELECT tag_id FROM tag_certificate tc WHERE tc.certificate_id = (" +
                 "SELECT certificate_id FROM order_certificate WHERE order_id = (" +
-                    "SELECT id FROM orders WHERE userid = :userId ORDER BY order_price DESC LIMIT 1))" +
+                    "SELECT id FROM orders WHERE user_id = :userId ORDER BY order_price DESC LIMIT 1))" +
             "GROUP BY tag_id having count(tag_id) > 1 " +
             "ORDER BY count(tag_id) DESC LIMIT 1 )";
 
