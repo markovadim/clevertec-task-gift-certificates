@@ -19,29 +19,29 @@ public class TagController {
     private final TagMapper tagMapper;
 
     @GetMapping
-    public ResponseEntity<List<TagDto>> findAll() {
+    public ResponseEntity<List<TagDto>> findAllTags() {
         return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDtoList(tagService.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TagDto> findById(@PathVariable long id) {
+    public ResponseEntity<TagDto> findTagById(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK).body(tagMapper.toDto(tagService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<TagDto> add(@RequestBody TagDto tagDto) {
+    public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {
         tagService.add(tagMapper.toEntity(tagDto));
         return ResponseEntity.status(HttpStatus.CREATED).body(tagDto);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TagDto> update(@PathVariable long id, @RequestBody TagDto updatedTagDto) {
+    public ResponseEntity<TagDto> updateTagById(@PathVariable long id, @RequestBody TagDto updatedTagDto) {
         tagService.update(id, tagMapper.toEntity(updatedTagDto));
         return ResponseEntity.status(HttpStatus.OK).body(updatedTagDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable long id) {
+    public ResponseEntity<?> deleteTagById(@PathVariable long id) {
         tagService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

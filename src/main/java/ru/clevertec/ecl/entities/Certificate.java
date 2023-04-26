@@ -1,7 +1,11 @@
 package ru.clevertec.ecl.entities;
 
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ru.clevertec.ecl.mapping.DurationConverter;
 
 import javax.persistence.*;
