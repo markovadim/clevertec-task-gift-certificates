@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/clevertec
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  liquibase:
+    change-log: db.changelog-master.yml
+    enabled: false
